@@ -35,28 +35,26 @@ A aplicação monitora alterações e executa ações automaticamente:
 Exibe mensagem quando o subtotal ultrapassa R$ 100
 Exibe aviso quando a quantidade de refrigerantes é maior que 5
 Registra atualizações do pedido no console
+
 ✅ Extras implementados
 Tema escuro
 Botão para limpar pedido
 Interface estilizada
 Layout responsivo
+
 🛠️ Tecnologias utilizadas
 HTML5
 CSS3
 JavaScript
 Vue.js 3 via CDN
+
 📂 Estrutura do projeto
 📁 projeto
  ├── index.html
  ├── style.css
  └── script.js
-▶️ Como executar
-Baixe ou clone o repositório:
-git clone https://github.com/seu-usuario/seu-repositorio.git
-Abra a pasta do projeto
-Execute o arquivo index.html no navegador
-📸 Interface
 
+📸 Interface
 O sistema possui:
 
 Área de produtos
