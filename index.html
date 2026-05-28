@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zé Burguer</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Vue.js via CDN (produção) -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── HEADER ───────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">🍔</div>
+      <div>
+        <h1 class="header-title">Zé<span>Burguer</span></h1>
+        <p class="header-subtitle">Sua busca pelo hambúrguer perfeito acaba aqui</p>
+      </div>
+    </div>
+
+    <div class="badge-total" v-if="totalItens > 0">
+      {{ totalItens }} {{ totalItens === 1 ? 'item' : 'itens' }} no pedido
+    </div>
+  </header>
+
+  <!-- ── MENSAGENS (watch) ─────────────────────────────────── -->
+  <div class="mensagens" v-if="mensagemSubtotal || mensagemRefrigerante">
+    <div class="msg msg-success" v-if="mensagemSubtotal">
+      {{ mensagemSubtotal }}
+    </div>
+    <div class="msg msg-warn" v-if="mensagemRefrigerante">
+      {{ mensagemRefrigerante }}
+    </div>
+  </div>
+
+  <!-- ── GRID PRINCIPAL ───────────────────────────────────── -->
+  <div class="main-grid">
+
+    <!-- ── CARDÁPIO ─────────────────────────────────────────── -->
+    <section>
+      <p class="section-title">Cardápio</p>
+
+      <template v-for="cat in categorias()" :key="cat">
+        <p class="categoria-titulo">{{ categoriaNome(cat) }}</p>
+
+        <div class="produto-grid">
+          <div
+            v-for="produto in produtosPorCategoria(cat)"
+            :key="produto.id"
+            class="produto-card"
+            :class="{ ativo: produto.quantidade > 0 }"
+          >
+            <span class="produto-emoji">{{ produto.emoji }}</span>
+
+            <div class="produto-info">
+              <p class="produto-nome">{{ produto.nome }}</p>
+              <p class="produto-preco">{{ formatarPreco(produto.preco) }}</p>
+            </div>
+
+            <div class="qty-control">
+              <button class="qty-btn" @click="decrementar(produto)" :disabled="produto.quantidade === 0">−</button>
+
+              <input
+                class="qty-input"
+                type="number"
+                min="0"
+                max="99"
+                v-model.number="produto.quantidade"
+              />
+
+              <button class="qty-btn" @click="incrementar(produto)">+</button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </section>
+
+    <!-- ── PAINEL DO PEDIDO ──────────────────────────────────── -->
+    <aside class="pedido-panel">
+      <div class="pedido-header">
+        <h2 class="pedido-titulo">Seu Pedido</h2>
+      </div>
+
+      <!-- estado vazio -->
+      <div class="pedido-vazio" v-if="pedidoVazio">
+        <div class="pedido-vazio-icon">🛒</div>
+        <p class="pedido-vazio-txt">Adicione itens ao pedido</p>
+      </div>
+
+      <!-- lista de itens -->
+      <ul class="itens-lista" v-else>
+        <li
+          class="item-linha"
+          v-for="item in itensPedido"
+          :key="item.id"
+        >
+          <span class="item-emoji">{{ item.emoji }}</span>
+          <span class="item-nome">{{ item.nome }}</span>
+          <span class="item-qty">× {{ item.quantidade }}</span>
+          <span class="item-sub">{{ formatarPreco(item.preco * item.quantidade) }}</span>
+        </li>
+      </ul>
+
+      <!-- resumo financeiro -->
+      <div class="resumo" v-if="!pedidoVazio">
+
+        <div class="resumo-linha">
+          <span class="resumo-label">Subtotal</span>
+          <span class="resumo-valor">{{ formatarPreco(subtotal) }}</span>
+        </div>
+
+        <div class="resumo-linha">
+          <span class="resumo-label">Taxa de entrega</span>
+          <span class="resumo-valor" :class="{ gratis: taxaEntrega === 0 }">
+            {{ taxaEntrega === 0 ? 'Grátis 🎉' : formatarPreco(taxaEntrega) }}
+          </span>
+        </div>
+
+        <div class="resumo-linha" v-if="desconto > 0">
+          <span class="resumo-label">Desconto (10%)</span>
+          <span class="resumo-valor desconto">− {{ formatarPreco(desconto) }}</span>
+        </div>
+
+        <div class="resumo-total">
+          <span class="resumo-total-label">Total</span>
+          <span class="resumo-total-valor">{{ formatarPreco(total) }}</span>
+        </div>
+
+        <!-- barra de progresso para entrega grátis -->
+        <div class="entrega-info" v-if="taxaEntrega > 0">
+          <span>Frete grátis a partir de R$ 80,00</span>
+          <div class="entrega-progress">
+            <div
+              class="entrega-progress-bar"
+              :style="{ width: Math.min((subtotal / 80) * 100, 100) + '%' }"
+            ></div>
+          </div>
+          <span>Faltam {{ formatarPreco(80 - subtotal) }}</span>
+        </div>
+
+        <!-- botão limpar pedido -->
+        <button class="btn-limpar" @click="limparPedido">
+          🗑 Limpar Pedido
+        </button>
+
+      </div>
+    </aside>
+
+  </div><!-- /main-grid -->
+
+</div><!-- /#app -->
+
+<script src="script.js"></script>
+</body>
+</html>
